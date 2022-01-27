@@ -34,9 +34,12 @@ document.addEventListener("DOMContentLoaded", function(event) {
     async function DisplayProduct(product){
         
         // Récupération des parents.
-        const title = document.getElementsByTagName("title")[0];
         const parentImg = document.getElementsByClassName("item__img");
-
+        const titlebase = document.getElementsByTagName("title")[0];
+        const title = document.getElementsByClassName("name")[0];
+        const price = document.getElementById("price");
+        const description = document.getElementById("description");
+        const colors = document.getElementById("colors");
 
         // Création de notre balise image avec les attributs.
         const productImg = document.createElement("img");
@@ -44,5 +47,30 @@ document.addEventListener("DOMContentLoaded", function(event) {
         productImg.setAttribute("alt", product.altTxt);
         // Push après notre balise à la fin de la liste.
         parentImg[0].appendChild(productImg);
+
+        title.insertAdjacentHTML(
+            "beforeend",
+            `${product.name}`
+        )
+
+        titlebase.insertAdjacentHTML(
+            "beforeend",
+            `${product.name}`
+        )
+
+        price.insertAdjacentHTML(
+            "beforeend",
+            `${product.price}`
+        );
+    
+        description.insertAdjacentHTML(
+            "beforeend",
+            `${product.description}`
+        );
+    
+        colors.insertAdjacentHTML(
+            "beforeend",
+            `<option>${product.colors}</option>` 
+        );
     }
 });
