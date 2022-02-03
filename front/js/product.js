@@ -11,7 +11,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
         let product = await GetProduct(productId);
 
         DisplayProduct(product);
-        
+        BtnClick(product);
     };
 
     main();
@@ -39,7 +39,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
         const title = document.getElementsByClassName("name")[0];
         const price = document.getElementById("price");
         const description = document.getElementById("description");
-        const colors = document.getElementById("colors");
+        const SelecteurColors = document.getElementById("colors");
 
         // Création de notre balise image avec les attributs.
         const productImg = document.createElement("img");
@@ -48,29 +48,44 @@ document.addEventListener("DOMContentLoaded", function(event) {
         // Push après notre balise à la fin de la liste.
         parentImg[0].appendChild(productImg);
 
-        title.insertAdjacentHTML(
-            "beforeend",
-            `${product.name}`
-        )
+        titlebase.insertAdjacentHTML("beforeend",`${product.name}`)
 
-        titlebase.insertAdjacentHTML(
-            "beforeend",
-            `${product.name}`
-        )
+        title.insertAdjacentHTML("beforeend",`${product.name}`);
 
-        price.insertAdjacentHTML(
-            "beforeend",
-            `${product.price}`
-        );
+        price.insertAdjacentHTML("beforeend",`${product.price}`);
     
-        description.insertAdjacentHTML(
-            "beforeend",
-            `${product.description}`
-        );
+        description.insertAdjacentHTML("beforeend",`${product.description}`);
     
-        colors.insertAdjacentHTML(
-            "beforeend",
-            `<option>${product.colors}</option>` 
-        );
+        
+        //* Création des choix couleur-------------------------------------------------
+
+        let itemscolors = product.colors;
+        itemscolors.forEach(function (element) {
+            SelecteurColors.appendChild(new Option(element, element));
+        });
+    };
+
+    async function BtnClick (product){
+        let colorchoosen = "";
+        let qtychoosen = "";
+        let btncart = document.getElementById("addToCart");
+
+        let colorselection = document.getElementById("colors");
+        colorselection.addEventListener("change", function(event) {
+            colorchoosen = event.target.value;
+            console.log(colorchoosen)
+        });
+
+        let qtyselection = document.getElementById("quantity");
+        qtyselection.addEventListener("change", function(event) {
+            qtychoosen = event.target.value;
+            console.log(qtychoosen)
+        });
+
+        btncart.addEventListener("click", function (){
+            // Les infos sont envoyées dans le local storage
+            localStorage.setItem("Colors", colorchoosen);
+            localStorage.setItem("Quantity", qtychoosen);
+        })
     }
 });

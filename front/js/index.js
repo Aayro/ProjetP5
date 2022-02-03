@@ -5,11 +5,10 @@ document.addEventListener("DOMContentLoaded", function(event) {
     async function main(){
 
         let products = await GetProducts();
-        
+    
         for(let article of products){
             displayproduct(article);
         }
-
     };
 
     main();
@@ -30,15 +29,13 @@ document.addEventListener("DOMContentLoaded", function(event) {
             console.log(error);
         })
     }
-
     //-------------------Fonction d'affichage du produit-------------------//
     //---------------------------------------------------------------------//
     function displayproduct(article){
 
         const DOMitems = document.getElementById("items");
 
-        DOMitems.insertAdjacentHTML(
-        "beforeend",
+        DOMitems.insertAdjacentHTML("beforeend",
         `<a href="./product.html?id=${article._id}">
             <article>
                 <img src="${article.imageUrl}" alt="${article.altTxt}">
@@ -47,7 +44,5 @@ document.addEventListener("DOMContentLoaded", function(event) {
                 </article>
         </a>`
         );
-
     }
-
 });
