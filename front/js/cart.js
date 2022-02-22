@@ -24,13 +24,12 @@ document.addEventListener("DOMContentLoaded", function (event) {
         let getLocalStorage = [];
         for (let i = 0; i < localStorage.length; i++) {
             getLocalStorage[i] = JSON.parse(localStorage.getItem(localStorage.key(i)));
-
         }
         return getLocalStorage;
 
     }
 
-    function GetApi(localStorageArray) {
+    async function GetApi(localStorageArray) {
 
         return fetch("http://localhost:3000/api/products/" + localStorageArray.id)
             .then(function (response) {
@@ -62,12 +61,13 @@ document.addEventListener("DOMContentLoaded", function (event) {
             }
 
             displayproduct(ObjectProduct);
-
             AllProducts.push(ObjectProduct);
+
         }
 
         displayTotalPrice(AllProducts);
-
+        displayTotalArticles(AllProducts);
+        updateQtyLS(AllProducts);
     }
 
     function displayproduct(ObjectProduct) {
@@ -99,8 +99,48 @@ document.addEventListener("DOMContentLoaded", function (event) {
         );
     };
 
+    function displayTotalArticles(AllProducts) {
+        let TotalArticlesCalcul = [];
+
+        for (let i = 0; i < AllProducts.length; i++) {
+            let Article = AllProducts[i].qty;
+            TotalArticlesCalcul.push(Article);
+        };
+
+        const reducer = (accumulator, currentValue) => accumulator + currentValue;
+        const TotalArticles = TotalArticlesCalcul.reduce(reducer, 0);
+
+        const DOMitems = document.getElementById("totalQuantity");
+        DOMitems.insertAdjacentHTML(
+            "beforeend",
+            `<span id="totalQuantity">${TotalArticles}</span>`
+        );
+    };
+
     function displayTotalPrice(AllProducts) {
 
+        let TotalPriceCalcul = [];
+
+        for (let i = 0; i < AllProducts.length; i++) {
+            let PricePerProduct = AllProducts[i].price * AllProducts[i].qty;
+            TotalPriceCalcul.push(PricePerProduct);
+        };
+
+        const reducer = (accumulator, currentValue) => accumulator + currentValue;
+        const TotalPrice = TotalPriceCalcul.reduce(reducer, 0);
+
+
+        const DOMitems = document.getElementById("totalPrice");
+        DOMitems.insertAdjacentHTML(
+            "beforeend",
+            `<span id="totalPrice">${TotalPrice}</span>`
+        );
+    };
+
+    function updateQtyLS(AllProducts) {
+    };
+
+    function deleteProduct(AllProducts) {
 
     };
 });
