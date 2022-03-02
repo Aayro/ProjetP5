@@ -11,7 +11,7 @@ document.addEventListener("DOMContentLoaded", function (event) {
         DisplayProduct(product);
         BtnClick(product);
 
-    };
+    }
 
     main();
 
@@ -21,13 +21,13 @@ document.addEventListener("DOMContentLoaded", function (event) {
             .then(function (response) {
                 if (response.ok) {
                     return response.json();
-                };
+                }
             })
             .catch(function (error) {
                 console.log(error);
             });
 
-    };
+    }
 
 
     async function DisplayProduct(product) {
@@ -60,21 +60,19 @@ document.addEventListener("DOMContentLoaded", function (event) {
         options.forEach(function (element) {
             SelecteurCouleur.appendChild(new Option(element, element));
         });
-
-
-
-    };
+    }
 
     //-------------------Initialisation Class Produit-------------------//
     //---------------------------------------------------------------------//
 
     class ProductClass {
-        constructor(id, color, qty) {
+        constructor(id, color, qty, name) {
             this.id = id;
             this.color = color;
             this.qty = qty;
+            this.name = name;
         };
-    };
+    }
 
     async function BtnClick(product) {
 
@@ -103,18 +101,19 @@ document.addEventListener("DOMContentLoaded", function (event) {
 
                 if (product._id === ProductLocalStorage[i].id && ProductLocalStorage[i].color === colorchoosen) {
                     oldQty = ProductLocalStorage[i].qty;
-                };
-            };
+                }
+            }
 
             qtychoosen = parseInt(oldQty) + parseInt(qty);
 
             let productChoosen = new ProductClass(
                 product._id,
                 colorchoosen,
-                qtychoosen
+                qtychoosen,
+                product.name
             );
 
-            if (colorchoosen != "" && qtychoosen >= 1 && qtychoosen <= 100) {
+            if (colorchoosen != null && qtychoosen >= 1 && qtychoosen <= 100) {
 
                 localStorage.setItem(
                     product.name + " " + colorchoosen,
@@ -122,7 +121,7 @@ document.addEventListener("DOMContentLoaded", function (event) {
                 );
             } else {
                 alert("Les champs à remplir ne sont pas correct.");
-            };
+            }
         });
-    };
+    }
 });

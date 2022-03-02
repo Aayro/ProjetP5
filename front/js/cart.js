@@ -13,8 +13,15 @@ document.addEventListener("DOMContentLoaded", function (event) {
             ApiArray.push(await GetApi(localStorageArray[i]));
         }
 
-        ConcatArray(localStorageArray, ApiArray);
+        let AllProducts = ConcatArray(localStorageArray, ApiArray);
 
+        Displayproduct(AllProducts);
+
+        DisplayTotalPrice(AllProducts);
+
+        Listen(AllProducts);
+
+        Regex();
     }
     main()
 
@@ -26,7 +33,6 @@ document.addEventListener("DOMContentLoaded", function (event) {
             getLocalStorage[i] = JSON.parse(localStorage.getItem(localStorage.key(i)));
         }
         return getLocalStorage;
-
     }
 
     async function GetApi(localStorageArray) {
@@ -40,7 +46,6 @@ document.addEventListener("DOMContentLoaded", function (event) {
             .catch(function (error) {
                 console.log(error);
             });
-
     }
 
     function ConcatArray(localStorageArray, ApiArray) {
@@ -58,89 +63,148 @@ document.addEventListener("DOMContentLoaded", function (event) {
                 price: ApiArray[i].price,
                 _id: localStorageArray[i].id,
                 qty: localStorageArray[i].qty
-            }
-
-            displayproduct(ObjectProduct);
+            };
             AllProducts.push(ObjectProduct);
-
         }
-
-        displayTotalPrice(AllProducts);
-        displayTotalArticles(AllProducts);
-        updateQtyLS(AllProducts);
+        return AllProducts;
     }
 
-    function displayproduct(ObjectProduct) {
+    function Displayproduct(AllProducts) {
 
         const DOMitems = document.getElementById("cart__items");
 
-        DOMitems.insertAdjacentHTML(
-            "beforeend",
-            `<article class="cart__item" data-id="${ObjectProduct._id}">
+        for (product of AllProducts) {
+
+
+            DOMitems.insertAdjacentHTML(
+                "beforeend",
+                `<article class="cart__item" data-id="${product._id}" data-color="${product.colors}">
                 <div class="cart__item__img">
-                    <img src="${ObjectProduct.imageUrl}" alt="${ObjectProduct.altTxt}">
-                    </div>
-                        <div class="cart__item__content">
-                            <div class="cart__item__content__titlePrice">
-                                <h2>${ObjectProduct.name} ${ObjectProduct.colors}</h2>
-                                    <p>${ObjectProduct.price}€</p>
-                    </div>
-                    <div class="cart__item__content__settings">
-                        <div class="cart__item__content__settings__quantity">
-                            <p>Qté : </p>
-                                <input type="number" class="itemQuantity" name="itemQuantity" min="1" max="100" value="${ObjectProduct.qty}">
+                  <img src="${product.imageUrl}" alt="Photographie d'un canapé">
+                </div>
+                <div class="cart__item__content">
+                  <div class="cart__item__content__description">
+                    <h2>${product.name}</h2>
+                    <p>${product.colors}</p>
+                    <p>${product.price}€</p>
+                  </div>
+                  <div class="cart__item__content__settings">
+                    <div class="cart__item__content__settings__quantity">
+                      <p>Qté : </p>
+                      <input type="number" class="itemQuantity" name="itemQuantity" min="1" max="100" value="${product.qty}"">
                     </div>
                     <div class="cart__item__content__settings__delete">
-                        <p class="deleteItem">Supprimer</p>
+                      <p class="deleteItem">Supprimer</p>
                     </div>
+                  </div>
                 </div>
-            </div>
-        </article>`
-        );
-    };
+              </article>`
+            );
+        }
+    }
 
-    function displayTotalArticles(AllProducts) {
-        let TotalArticlesCalcul = [];
+    function DisplayTotalPrice(AllProducts) {
 
-        for (let i = 0; i < AllProducts.length; i++) {
-            let Article = AllProducts[i].qty;
-            TotalArticlesCalcul.push(Article);
-        };
+        let totalPrice = 0;
+        let totalQty = 0;
 
-        const reducer = (accumulator, currentValue) => accumulator + currentValue;
-        const TotalArticles = TotalArticlesCalcul.reduce(reducer, 0);
+        for (product of AllProducts) {
+            totalPrice += parseInt(product.qty * product.price);
+            totalQty += parseInt(product.qty);
+        }
 
-        const DOMitems = document.getElementById("totalQuantity");
-        DOMitems.insertAdjacentHTML(
-            "beforeend",
-            `<span id="totalQuantity">${TotalArticles}</span>`
-        );
-    };
+        const DtotalQty = document.getElementById("totalQuantity");
+        const DtotalPrice = document.getElementById("totalPrice");
 
-    function displayTotalPrice(AllProducts) {
+        DtotalQty.innerText = totalQty;
+        DtotalPrice.innerText = totalPrice;
+    }
 
-        let TotalPriceCalcul = [];
-
-        for (let i = 0; i < AllProducts.length; i++) {
-            let PricePerProduct = AllProducts[i].price * AllProducts[i].qty;
-            TotalPriceCalcul.push(PricePerProduct);
-        };
-
-        const reducer = (accumulator, currentValue) => accumulator + currentValue;
-        const TotalPrice = TotalPriceCalcul.reduce(reducer, 0);
+    function Listen(AllProducts) {
+        EcouteQuantity(AllProducts);
+        EcouteDeleteProduct(AllProducts);
+    }
 
 
-        const DOMitems = document.getElementById("totalPrice");
-        DOMitems.insertAdjacentHTML(
-            "beforeend",
-            `<span id="totalPrice">${TotalPrice}</span>`
-        );
-    };
 
-    function updateQtyLS(AllProducts) {
-    };
+    function EcouteQuantity(AllProducts) {
 
-    function deleteProduct(AllProducts) {
+        let qtyinput = document.querySelectorAll(".itemQuantity");
 
-    };
+        qtyinput.forEach(function (input) {
+            input.addEventListener("change", function (inputEvent) {
+                let inputQty = inputEvent.target.value;
+
+                const productName = input
+                    .closest("div.cart__item__content")
+                    .querySelector("div.cart__item__content__description > h2").innerText;
+
+                const productcouleur = input
+                    .closest("div.cart__item__content")
+                    .querySelector("div.cart__item__content__description > p").innerText;
+
+                const productNameColor = productName + " " + productcouleur;
+
+                let localstorageKey = JSON.parse(localStorage.getItem(productNameColor));
+
+                localstorageKey.qty = inputQty;
+
+                localStorage.setItem(productNameColor, JSON.stringify(localstorageKey));
+
+                const result = AllProducts.find(AllProduct => AllProduct.name === localstorageKey.name && AllProduct.colors === localstorageKey.color)
+
+                result.qty = inputQty;
+
+                DisplayTotalPrice(AllProducts);
+            });
+        });
+    }
+
+    function EcouteDeleteProduct(AllProducts) {
+
+        let deleteLink = document.querySelectorAll(".deleteItem");
+
+        deleteLink.forEach(function (input) {
+            input.addEventListener("click", function () {
+
+                const productName = input
+                    .closest("div.cart__item__content")
+                    .querySelector("div.cart__item__content__description > h2").innerText;
+
+                const productcouleur = input
+                    .closest("div.cart__item__content")
+                    .querySelector("div.cart__item__content__description > p").innerText;
+
+                const productNameColor = productName + " " + productcouleur;
+
+                let localstorageKey = JSON.parse(localStorage.getItem(productNameColor));
+
+                localStorage.removeItem(productNameColor);
+
+                input.closest("div.cart__item__content").parentNode.remove();
+
+                const result = AllProducts.find(AllProduct => AllProduct.name === localstorageKey.name && AllProduct.colors === localstorageKey.color);
+
+                AllProducts = AllProducts.filter(e => e !== result);
+
+                EcouteQuantity(AllProducts);
+                DisplayTotalPrice(AllProducts);
+            });
+        });
+    }
+
+    function Regex(){
+
+        let firstNameId = document.getElementById("firstName");
+        firstNameId.addEventListener("change", function (inputEvent) {
+
+            const inputFirstName = inputEvent.target.value;
+
+            let firstNameRegex = new RegExp(`[A-Za-z]`);
+
+            if (firstNameRegex) {
+            } else {
+            }
+        })
+    }
 });
