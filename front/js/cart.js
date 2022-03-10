@@ -279,12 +279,22 @@ document.addEventListener("DOMContentLoaded", function (event) {
                         products: products,
                     };
 
+                    const options = {
+                        method: "POST",
+                        body: JSON.stringify(order),
+                        headers: {
+                            Accept: "application/json",
+                            "Content-Type": "application/json",
+                        },
+                    };
+
                     // appel ajax à ton api en method POST sont body = json.stringify(order)
 
-                    fetch("http://localhost:3000/api/products/order")
+                    fetch("http://localhost:3000/api/products/order", options)
                         .then((res) => res.json())
                         .then(function (data) {
-                        window.location.href = ""
+
+                            window.location.href = "confirmation.html?id=" + data.orderId;
                         })
                         .catch(function (error) {
                             console.log(error);
