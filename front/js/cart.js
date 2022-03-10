@@ -21,7 +21,7 @@ document.addEventListener("DOMContentLoaded", function (event) {
 
         Listen(AllProducts);
 
-        Regex();
+        validation();
     }
     main()
 
@@ -193,18 +193,114 @@ document.addEventListener("DOMContentLoaded", function (event) {
         });
     }
 
-    function Regex(){
+    // conditions regex et verification
+    function validationRegex(form) {
 
-        let firstNameId = document.getElementById("firstName");
-        firstNameId.addEventListener("change", function (inputEvent) {
+        // conditions regex string email et adresse
+        const stringRegex = /^[a-zA-Z-]+$/;
+        const emailRegex = /^\w+([.-]?\w+)@\w+([.-]?\w+).(.\w{2,3})+$/;
+        const addressRegex = /^[a-zA-Z0-9\s,.'-]{3,}$/;
 
-            const inputFirstName = inputEvent.target.value;
+        let control = true;
 
-            let firstNameRegex = new RegExp(`[A-Za-z]`);
+        if (!form.firstName.value.match(stringRegex)) {
+            document.getElementById("firstNameErrorMsg").innerText = "Le prénom donné ne semble pas correct !";
+            control = false;
+        } else {
+            document.getElementById("firstNameErrorMsg").innerText = "";
+        }
 
-            if (firstNameRegex) {
+
+        if (!form.lastName.value.match(stringRegex)) {
+            document.getElementById("lastNameErrorMsg").innerText = "Le nom donné ne semble pas correct !";
+            control = false;
+        } else {
+            document.getElementById("lastNameErrorMsg").innerText = "";
+        }
+
+        if (!form.address.value.match(addressRegex)) {
+            document.getElementById("addressErrorMsg").innerText = "L'adresse donnée ne semble pas correcte !";
+            control = false;
+        } else {
+            document.getElementById("addressErrorMsg").innerText = "";
+        }
+
+        if (!form.city.value.match(stringRegex)) {
+            document.getElementById("cityErrorMsg").innerText = "La ville donnée ne semble pas correcte !";
+            control = false;
+        } else {
+            document.getElementById("cityErrorMsg").innerText = "";
+        }
+
+        if (!form.email.value.match(emailRegex)) {
+            document.getElementById("emailErrorMsg").innerText = "L'email donné ne semble pas correct !";
+            control = false;
+        } else {
+            document.getElementById("emailErrorMsg").innerText = "";
+        }
+
+        if (control) {
+            return true;
+        } else {
+            return false;
+        }
+
+
+    }
+
+    // fetch POST API si regex valide
+    function validation() {
+
+        let orderButton = document.getElementById("order");
+        orderButton.addEventListener("click", function (event) {
+            let form = document.querySelector(".cart__order__form");
+            event.preventDefault();
+
+            if (localStorage.length !== 0) {
+
+                if (validationRegex(form)) {
+
+                    let formInfo = {
+                        firstName: form.firstName.value,
+                        lastName: form.lastName.value,
+                        address: form.address.value,
+                        city: form.city.value,
+                        email: form.email.value,
+                    };
+
+                    let products = [];
+
+                    for (let i = 0; i < localStorage.length; i++) {
+                        products[i] = JSON.parse(localStorage.getItem(localStorage.key(i))).id;
+                    }
+
+                    const order = {
+                        contact: formInfo,
+                        products: products,
+                    };
+
+                    // appel ajax à ton api en method POST sont body = json.stringify(order)
+
+                    fetch("http://localhost:3000/api/products/order")
+                        .then((res) => res.json())
+                        .then(function (data) {
+                        window.location.href = ""
+                        })
+                        .catch(function (error) {
+                            console.log(error);
+                        });
+
+
+                } else {
+                    event.preventDefault();
+                    alert("le formulaire est mal remplis");
+                }
+
             } else {
+                event.preventDefault();
+                alert("Le panier est vide.");
             }
         })
+
     }
 });
